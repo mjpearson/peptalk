@@ -1,0 +1,130 @@
+body {
+    color: #333333;
+    padding:0px;
+    margin:10px;
+    background-color: #ffffff;
+    font-size: 0.7em;
+    font-family: Verdana, "Verdana CE", Arial, "Arial CE", "Lucida Grande CE", lucida, "Helvetica CE", sans-serif;
+}
+
+a {
+    color: #80e5ff;
+    text-decoration: none;
+    border-bottom: 1px dotted;
+    font-weight: bold;
+}
+
+#authd {
+    background:none repeat scroll 0 0 #FFFFFF;
+    border:1px solid black;
+    font-family:verdana,arial,helvetica;
+    font-size:14px;
+    padding: 10px;
+    width: 530px;
+    text-align: center;
+    -moz-border-radius:10px 10px 10px 10px;
+    -moz-box-shadow:0.4em 0.4em 2em -0.8em black;
+}
+
+#opcontrol {
+    width: 400px;
+}
+
+.editable {
+    color: #1C94C4;
+    font-weight: bold;
+}
+
+/* Queue */
+#queue {
+    overflow: auto;
+    height: 400px;
+    padding: 5px;
+    background: white;
+    text-align: left;
+}
+
+
+#qcontrol {
+    float: right;
+    font-weight: bold;
+    color: #80e5ff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* search and results */
+
+.results {
+    padding: 15px;
+    overflow: auto;
+    text-align: left;
+    height: 300px;
+}
+
+.resultrow {
+    padding: 5px;
+}
+
+.odd {
+    background-color: #fff;
+}
+
+.transcript {
+    padding: 2px;
+    background-color: #fff;
+    color: #000;
+    height: 200px;
+    overflow: auto;
+}
+
+.label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* User management */
+.tableheader td {
+    
+    border: 1px solid #0088AA;
+    background-color:#00AAD4;
+    color:#FFFFFF;
+    padding:2px;
+    width:auto;
+    width: 60px;
+}
+
+.controltable td {
+    width: 60px;
+}
+
+.controltable input {
+    height: 10px;
+    width: 60px;
+}
+
+.inputwide {
+    height: 10px;
+    width: 120px;
+}
+
+.inputError {
+    background-color: #ffaacc;
+}
+
+.userrow {
+    border-bottom: 1px solid #0088AA;
+}
+
+.odd {
+
+}
+
+
+
+
+
+
+
+
+
