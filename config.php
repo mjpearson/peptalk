@@ -12,4 +12,6 @@ define('PT_MEMCACHED_PORT', '11211');
 define('PT_CASSANDRA_CONSISTENCY', 1);
 
 define('PT_BASE_URL', 'http://localhost/peptalk/');
+
+define('PT_SESSION_PFX', 'PTK_');
 ?>

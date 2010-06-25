@@ -67,9 +67,9 @@ class Auth extends PandraColumnFamily {
     }
 
     static public function ok() {
-        $ok = isset($_SESSION['username']) &&
-                (!empty($_SESSION['username']) &&
-                        $_SESSION['ptkoperator']
+        $ok = isset($_SESSION[PT_SESSION_PFX.'username']) &&
+                (!empty($_SESSION[PT_SESSION_PFX.'username']) &&
+                        $_SESSION[PT_SESSION_PFX.'operator']
         );
         return $ok;
     }
@@ -82,48 +82,12 @@ class Auth extends PandraColumnFamily {
         $found = $auth->load();
         
         if ($found && $auth->getColumn('password')->compareToCB($password)) {
-
-            if ($auth['type'] == (int) self::ADMIN) {
-                $_SESSION['ptkadmin'] = TRUE;
-            } else {
-                $_SESSION['ptkadmin'] = FALSE;
-            }
-
-            $_SESSION['username'] = $auth->getKeyID();
-            $_SESSION['displayname'] = $auth['displayname'];
-            $_SESSION['ptkoperator'] = TRUE;
-
+            Session::bindUser($auth->getKeyID(), $auth['displayname'], $auth['type'] == (int) self::ADMIN);
+            Session::setUserLocal(TRUE);
             return TRUE;
         }
+        exit;
         return FALSE;
-    }
-
-    /**
-     *
-     * @return bool Session is an operator
-     */
-    static public function isOperator() {
-        return isset($_SESSION['ptkoperator']) && $_SESSION['ptkoperator'];
-    }
-
-    /**
-     *
-     */
-    static public function isAdmin() {
-        return self::isOperator() && isset($_SESSION['ptkadmin']) && $_SESSION['ptkadmin'];
-    }
-
-    static public function setAdmin($bool) {
-        $_SESSION['ptkadmin'] = $bool;
-
-    }
-
-    static public function setOperator($bool) {
-        $_SESSION['ptkoperator'] = $bool;
-    }
-
-    static public function getOperatorName() {
-        return $_SESSION['username'];
-    }
+    }   
 }
 ?>

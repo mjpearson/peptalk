@@ -43,12 +43,12 @@ class ptkChat extends ptkController {
 
     public function __construct() {
         parent::__construct();
-        if (empty($_SESSION['cid'])) {
-            $_SESSION['cid'] = UUID::v1();
+        if (empty($_SESSION[PT_SESSION_PFX.'cid'])) {
+            $_SESSION[PT_SESSION_PFX.'cid'] = UUID::v1();
         }
 
         // Grab generated chat id, meta and chat log
-        $this->cid = $_SESSION['cid'];
+        $this->cid = $_SESSION[PT_SESSION_PFX.'cid'];
 
         $this->_meta = new Meta($this->cid);
 
@@ -57,8 +57,8 @@ class ptkChat extends ptkController {
 
     public function cleanup () {
         $this->cid = NULL;
-        unset($_SESSION['cid']);
-        unset($_SESSION['last']);
+        unset($_SESSION[PT_SESSION_PFX.'cid']);
+        unset($_SESSION[PT_SESSION_PFX.'last']);
     }
 
     public function drop() {
@@ -84,7 +84,7 @@ class ptkChat extends ptkController {
 
         $new = !$this->_meta->load();
 
-        $op = Auth::isOperator();
+        $op = Session::isOperator();
 
         // new guest?  Create a new meta + queue entry
         if ($new && !$op) {
@@ -105,7 +105,7 @@ class ptkChat extends ptkController {
 
             // Save the last message id to session
             if ($cl->save()) {
-                $_SESSION['last'] = $msgID;
+                $_SESSION[PT_SESSION_PFX.'last'] = $msgID;
                 $this->responseOK();
             } else {
                 $this->responseERR();
@@ -128,10 +128,10 @@ class ptkChat extends ptkController {
         $cid = $this->cid;
         $m = $this->_meta;
 
-        $op = Auth::isOperator();
+        $op = Session::isOperator();
         // If chat does not exist or is a guest without a last message, then
         // we have a problem
-        if (!$m->load() || (!$op && !isset($_SESSION['last']))) {
+        if (!$m->load() || (!$op && !isset($_SESSION[PT_SESSION_PFX.'last']))) {
 
             $this->responseNOP();
 
@@ -144,15 +144,15 @@ class ptkChat extends ptkController {
         } else {
 
             // Load whole of log if it hasn't been retrieved before
-            if (empty($_SESSION['last'])) {
+            if (empty($_SESSION[PT_SESSION_PFX.'last'])) {
                 $cl->reverse(FALSE)->load();
             } else {
-                $cl->start($_SESSION['last'])->reverse(FALSE)->load();
+                $cl->start($_SESSION[PT_SESSION_PFX.'last'])->reverse(FALSE)->load();
             }
 
             // polling ignores the last message the client sent
             if ($r['poll'] == 'true') {
-                $lastUUID = UUID::convert($_SESSION['last'], UUID::UUID_FMT_STR);
+                $lastUUID = UUID::convert($_SESSION[PT_SESSION_PFX.'last'], UUID::UUID_FMT_STR);
                 unset($cl[$lastUUID]);
             }
 
@@ -160,7 +160,7 @@ class ptkChat extends ptkController {
 
             if (count($cl)) {
                 $cSuper = $cl->current();
-                $_SESSION['last'] = $cSuper->getName();
+                $_SESSION[PT_SESSION_PFX.'last'] = $cSuper->getName();
 
                 foreach ($cl as $sc => $column) {
                     if ($column['type'] == 'guest') {

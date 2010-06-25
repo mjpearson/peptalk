@@ -1,9 +1,9 @@
 <?php
-$auth = new Auth($_SESSION['username']);
+$auth = new Auth($_SESSION[PT_SESSION_PFX.'username']);
 $auth->load();
 
 // Load the operators list for admin
-if (Auth::isAdmin()) {
+if (Session::isAdmin()) {
     // grab a list of users
     $users = PandraCore::getRangeKeys('Peptalk', array('', ''), new cassandra_ColumnParent(array('column_family' => 'Auth')),
             new PandraSlicePredicate(PandraSlicePredicate::TYPE_COLUMNS, $auth->getColumnNames()));
@@ -35,7 +35,7 @@ if (Auth::isAdmin()) {
         <div id="container">
             <div style="position:absolute; left:400px; top: 50px;" id="peptalk_div"></div>
             <div id="opcontrol">
-
+                <?php if ($_SESSION[PT_SESSION_PFX.'userlocal']) { ?>
                 <h3><a id="profileheader" href="#">My Profile</a></h3>
                 <div>
                     <p>
@@ -45,7 +45,7 @@ if (Auth::isAdmin()) {
                                 <table cellpadding="5px">
                                     <tr>
                                         <td class="label">Username</td>
-                                        <td><?php echo $_SESSION['username'];?></td>
+                                        <td><?php echo $_SESSION[PT_SESSION_PFX.'username'];?></td>
                                     </tr>
 
                                     <tr>
@@ -72,7 +72,8 @@ if (Auth::isAdmin()) {
                         </div>
                     </p>
                 </div>
-
+                <?php } ?>
+                
                 <h3><a id="queueheader" href="#">Support Queue</a></h3>
                 <div style="padding: 0px;">
                     <div id="queue"></div>
@@ -95,7 +96,7 @@ if (Auth::isAdmin()) {
 
                 </div>
 
-                <?php if (Auth::isAdmin()) { ?>
+                <?php if (Session::isAdmin()) { ?>
                 <h3><a id="uadminheader" href="#">User Admin</a></h3>
                 <div style="padding: 0px;">
                     <p>

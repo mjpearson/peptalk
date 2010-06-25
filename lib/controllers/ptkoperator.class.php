@@ -164,7 +164,7 @@ class ptkOperator extends ptkController {
     public function execProfileUpdate() {
         $r = $this->_request;
 
-        $a = new Auth($_SESSION['username']);
+        $a = new Auth($_SESSION[PT_SESSION_PFX.'username']);
         if ($a->load()) {
             $a->reset();
 
@@ -192,7 +192,7 @@ class ptkOperator extends ptkController {
      * Updates the profile of a named user (admin only)
      */
     public function execUserUpdate() {
-        if (!Auth::isAdmin()) {
+        if (!Session::isAdmin()) {
             throw new ControllerAuthException();
         }
 
@@ -227,7 +227,7 @@ class ptkOperator extends ptkController {
      * Creates a new user in Cassandra (admin only)
      */
     public function execNewUser() {
-        if (!Auth::isAdmin()) {
+        if (!Session::isAdmin()) {
             throw new ControllerAuthException();
         }
         
@@ -251,7 +251,7 @@ class ptkOperator extends ptkController {
      * Deletes a user from Cassandra (admin only)
      */
     public function execDelUser() {
-        if (!Auth::isAdmin()) {
+        if (!Session::isAdmin()) {
             throw new ControllerAuthException();
         }
 
@@ -276,8 +276,8 @@ class ptkOperator extends ptkController {
      * Destroys any open chats and drops the
      */
     public function execLogout() {
-        if (!empty($_SESSION['cid'])) {
-            Meta::close($_SESSION['cid']);
+        if (!empty($_SESSION[PT_SESSION_PFX.'cid'])) {
+            Meta::close($_SESSION[PT_SESSION_PFX.'cid']);
         }
 
         session_destroy();
@@ -371,12 +371,12 @@ class ptkOperator extends ptkController {
         // Bind the operator session to the cid
         if ($ok && $loaded && $m['status'] == Meta::STATUS_NEW) {
 
-            $_SESSION['cid'] = $cid;
+            $_SESSION[PT_SESSION_PFX.'cid'] = $cid;
 
             // first poll should be from beginning
-            $_SESSION['last'] = '';
+            $_SESSION[PT_SESSION_PFX.'last'] = '';
 
-            $m['operator'] = $_SESSION['username'];
+            $m['operator'] = $_SESSION[PT_SESSION_PFX.'username'];
             $m['status'] = Meta::STATUS_CHAT;
             $m->save();
 

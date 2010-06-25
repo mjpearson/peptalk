@@ -41,9 +41,9 @@ class Log extends PandraSuperColumnFamily {
         $message['message'] = $msg;
         $message['servertime'] = time();
 
-        if (Auth::isOperator()) {
+        if (Session::isOperator()) {
             //$message['user'] = Auth::getOperatorName();
-            $message['user'] = $_SESSION['displayname'];
+            $message['user'] = $_SESSION[PT_SESSION_PFX.'displayname'];
             $message['type'] = 'operator';
         } else {
             $message['user'] = session_id();
