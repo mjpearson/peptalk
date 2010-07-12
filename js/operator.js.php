@@ -1,69 +1,74 @@
-function ptkOp() {
+<?php
+    require_once(dirname(__FILE__).'/../config.php');
+?>
+operator = {
 
-    this.active = null;
+    active: null,
 
-    this.parseResponse = function(data) {
+    alt: false,
+
+    parseResponse: function(data) {
         if (data.status == 'OK') {
             return true;
         } else if (data.status = 'NOAUTH') {
             window.location('auth');            
         }
-    }
+    },
 
-    this.flashE = function(target) {
+    flashE: function(target) {
         $('#' + target).animate( { backgroundColor: '#7fff2a'}, 200, function () {
             $('#' + target).animate( { backgroundColor: '#fff'}, 200)
         });
-    }
+    },
 
-   //
-    this.init = function() {
+    init: function() {
+
+        var self = this;
 
         $("#opcontrol").accordion({ active : 1});
-
 
         $(function() {
                 $("#dateto").datepicker({ dateFormat: 'yymmdd' });
                 $("#datefrom").datepicker({ dateFormat: 'yymmdd' });
         });
 
-        // @todo fix...
-        // setup in-place editor
-        $('#session_displayname').editInPlace( {url : 'operator/profileupdate', success: function() {
-                    operator.flashE('profileheader');
-                }
+        $('#session_displayname').editInPlace(
+            {url : 'operator/profileupdate', success: function() {
+                self.flashE('profileheader');
+            }
         });
 
-        $('#session_emailaddress').editInPlace( {url : 'operator/profileupdate', success: function() {
-                    operator.flashE('profileheader');
-                }
+        $('#session_emailaddress').editInPlace(
+            {url : 'operator/profileupdate', success: function() {
+                self.flashE('profileheader');
+            }
         });
 
-        $('#session_password').editInPlace( {url : 'operator/profileupdate', success: function() {
-                    operator.flashE('profileheader');
-                }
+        $('#session_password').editInPlace(
+            {url : 'operator/profileupdate', success: function() {
+                self.flashE('profileheader');
+            }
         });
+    },
 
-    };
-
-    this.auth = function() {
-        $.getJSON('operator/auth', { 'authUn' : $('#authUn').attr('value'), 'authPw' : $('#authPw').attr('value')}, function(data) {
-            operator.init();
+    auth: function() {
+        var self = this;
+        $.getJSON('<?php echo PT_BASE_URL; ?>operator/auth', { 'authUn' : $('#authUn').attr('value'), 'authPw' : $('#authPw').attr('value')}, function(data) {
+            self.init();
         });
-    };
+    },
 
-
-    this.logout = function() {
-        $.getJSON('operator/logout',  function() {
+    logout: function() {
+        var self = this;
+        $.getJSON('<?php echo PT_BASE_URL; ?>operator/logout',  function() {
             // drop any open chats
             ptc.disconnect(true);
-            //ptc.logout();
             location.reload();
         });
-    }
+    },
 
-    this.render = function(view) {
-        active = operator.active;
+    render: function(view) {
+        active = this.active;
         if (active != null) {
            $('#' + active).css('display', 'none');
         }
@@ -78,7 +83,7 @@ function ptkOp() {
 
             $.ajax({
                type: 'get',
-               url: 'operator/' + view,
+               url: '<?php echo PT_BASE_URL; ?>operator/' + view,
                success: function(data) {
                    $('#' + view).html(data);
                }
@@ -86,21 +91,21 @@ function ptkOp() {
         }
         
         $('#' + view).css('display', 'block');
-        operator.active = view;
-    }
+        this.active = view;
+    },
 
     // Dequeues chat and begins reply
-    this.reply = function (cid) {
-        $.getJSON('operator/dequeue', 
-                    {'cid' : cid},
-                    function () {
-                        ptc.operator = true;
-                        ptc.render();
-                        ptc.refresh();
-                    }
-        )};
+    reply: function (cid) {
+        $.getJSON('<?php echo PT_BASE_URL; ?>operator/dequeue',
+            {'cid' : cid},
+            function () {
+                ptc.operator = true;
+                ptc.render();
+                ptc.refresh();
+            }
+    )},
 
-    this.profileUpdate = function() {
+    profileUpdate: function() {
 
         var profile = $('#profileSelf');
         var opStat = $('#operationstatus');
@@ -109,7 +114,7 @@ function ptkOp() {
 
          $.ajax({
                type: 'post',
-               url: 'operator/profileupdate',
+               url: '<?php echo PT_BASE_URL; ?>operator/profileupdate',
                data: {
                    'password' : $('#password').val(),
                    'emailaddress' : $('#emailaddress').val(),
@@ -119,17 +124,15 @@ function ptkOp() {
                    opStat.html('OK');
                    opStat.css('display', 'block');
                    opStat.fadeIn();
-                   setTimeout(function () { $('#operationstatus').fadeOut() }, 1000);
+                   setTimeout(opStat.fadeOut(), 1000);
                }
-            });
-        
-    }
-
-    var alt = false;
+            });       
+    },
 
     // runs and returns search results for historical transcripts
-    this.search = function() {
-        $.getJSON('operator/datesearch', { 'datefrom' : $('#datefrom').val(), 'dateto' : $('#dateto').val() },
+    search: function() {
+        var self = this;
+        $.getJSON('<?php echo PT_BASE_URL; ?>operator/datesearch', { 'datefrom' : $('#datefrom').val(), 'dateto' : $('#dateto').val() },
             function(data) {
                 $.each(data, function(status, payload) {
                     // render results
@@ -137,58 +140,52 @@ function ptkOp() {
                         $('#searchresult').html('');
                         $.each(payload, function(ctime, entity) {
                             $.each(entity, function(ctime, struct) {                                
-                                $('#searchresult').append($("<div class='resultrow " + (operator.alt ? "odd" : "") + "'><div id='qcontrol'><a id='replybutton' onclick='javascript:operator.loadTranscript(\"" + struct.cid + "\");'>display</a></div><div id='cidinfo'><b>" + struct.time + " " + struct.operator + "</b> [" + struct.remote + "] " + struct.message + "</div></div>  <div class='transcript' id='cidtranscript_" + struct.cid + "' style='display:none'></div>"));
-                                operator.alt = !operator.alt;
+                                $('#searchresult').append($("<div class='resultrow " + (self.alt ? "odd" : "") + "'><div id='qcontrol'><a id='replybutton' onclick='javascript:self.loadTranscript(\"" + struct.cid + "\");'>display</a></div><div id='cidinfo'><b>" + struct.time + " " + struct.operator + "</b> [" + struct.remote + "] " + struct.message + "</div></div>  <div class='transcript' id='cidtranscript_" + struct.cid + "' style='display:none'></div>"));
+                                self.alt = !self.alt;
                             });
                         });
-                    }
-                    
+                    }                    
                 });
             });
-    }
+    },
 
-    var opents = null;
+    opents: null,
+    ts: '',
 
-    var ts = '';
-
-    this.loadTranscript = function (cid) {
+    loadTranscript: function (cid) {
+        var self = this;
         // close the transcript on second click
         if (cid == this.opents) {
             $('#cidtranscript_' + this.opents).css('display', 'none');
             this.opents = null;
             this.ts = '';
         } else {
-            $.getJSON('operator/loadTranscript', { 'cid' : cid },
+            $.getJSON('<?php echo PT_BASE_URL; ?>operator/loadTranscript', { 'cid' : cid },
                 function(data) {
                     $.each(data, function(status, payload) {
                         if (status == 'OK') {
-                            if (operator.opents != null) {
-                                $('#cidtranscript_' + operator.opents).css('display', 'none');
+                            if (self.opents != null) {
+                                $('#cidtranscript_' + self.opents).css('display', 'none');
                             }
-
-                            operator.opents = cid;
+                            self.opents = cid;
                             $('#cidtranscript_' + cid).html('');
-
                             $.each(payload, function(idx, message) {
                                 $.each(message, function(cid, struct) {
                                     var who = (struct.type == 'operator') ? struct.user : 'Guest';
-                                    operator.ts = operator.ts + "<div><b>" + who + "</b> > "+ struct.message +"</div>";
+                                    self.ts = self.ts + "<div><b>" + who + "</b> > "+ struct.message +"</div>";
                                 });
                             });
-
-                            $('#cidtranscript_' + cid).html(operator.ts);
-                            operator.ts = '';
-
+                            $('#cidtranscript_' + cid).html(self.ts);
+                            self.ts = '';
                             $('#cidtranscript' + cid).css('display', 'block');
-                            $('#cidtranscript_' + operator.opents).fadeIn(1000);
+                            $('#cidtranscript_' + self.opents).fadeIn(1000);
                         }
                     });
                 });
         }
-    }
+    },
 
-    this.create = function() {
-
+    create: function() {
         ok = false;
         payload = new Array();
 
@@ -228,31 +225,20 @@ function ptkOp() {
         if (ok) {
             $.ajax({
                type: 'post',
-               url: 'operator/newuser',
+               url: '<?php echo PT_BASE_URL; ?>operator/newuser',
                data: payload,
                dataType: 'html',
                success: function(data) {
-                   operator.flashE('uadminheader');
+                   self.flashE('uadminheader');
                },
                error : function(request, status) {
                    alert(request.responseText);
                }
             });
-
         }        
-    }
+    },
 
-    this.rmuser = function(user) {
-        $.getJSON('operator/deluser', { 'username' : user } );
+    rmuser: function(user) {
+        $.getJSON('<?php echo PT_BASE_URL; ?>operator/deluser', { 'username' : user } );
     }
 }
-
-var operator = new ptkOp();
-
-$(document).ready(function() {
-    operator.init();
-    //ptChatInit();
-    //window.setInterval('refresh(true)', 1000);
- });
-
-

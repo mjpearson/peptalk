@@ -64,25 +64,26 @@ session_start();
 ob_start();
 
 // setup our memcache capabilities
-if (class_exists('Memcahced')) {
+if (class_exists('Memcached')) {
     $_MemCached = new Memcached();
-    $_MemCached->addServer(PT_MEMCACHED_SERVER, PT_MEMCACHED_PORT);
-    $_mcPfx = 'memc.sess.key.';
-    $_mcPfxLock = 'memc.sess.key_lock.';
-
+    
 } elseif (class_exists('Memcache')) {
     $_MemCached = new Memcache();
-    $_MemCached->addServer(PT_MEMCACHED_SERVER, PT_MEMCACHED_PORT);
-    $_mcPfx = '';
-    $_mcPfxLock = '';
+    
 }
+
+$_MemCached->addServer(PT_MEMCACHED_SERVER, PT_MEMCACHED_PORT);
+//$_mcPfx = 'memc.sess.key.';
+//$_mcPfxLock = 'memc.sess.key_lock.';
+$_mcPfx = '';
+$_mcPfxLock = '';
 
 // Connect to our cluster
 PandraCore::auto(PT_CLUSTER_HOST);
 
 // Set consistency
 PandraCore::setConsistency(PT_CASSANDRA_CONSISTENCY);
-
+/*
 $a = new Auth('admin');
 $a['displayname'] = 'Administrator';
 $a['password'] = 'password';
@@ -90,6 +91,11 @@ $a['type'] = Auth::ADMIN;
 $a['joindate'] = time();
 $a['emailaddress'] = 'yourname@yourdomain.com';
 $a->save();
+*/
+
+function jSig($filename) {    
+    return 'js/'.$filename.'.'.md5_file(dirname(__FILE__).'/js/'.$filename.'.js.php').'.js';
+}
 
 if (isset($_REQUEST['controller'])) {
     $controller = $_REQUEST['controller'];
@@ -98,8 +104,9 @@ if (isset($_REQUEST['controller'])) {
     }
 
     $view = $_REQUEST['view'];
-    
+
     $controllerClass = 'ptk'.$controller;
+
     if (class_exists($controllerClass)) {
         $_controller = new $controllerClass();
         $_controller->parseRequest($_REQUEST);

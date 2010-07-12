@@ -1,6 +1,4 @@
 #chatdialog {
-    margin-top: 10px;
-    margin-left: 10px;
     width: 300px;
     display:none;
     font-family:verdana,arial,helvetica;
@@ -94,4 +92,10 @@
 
 #peptalk_div {
     float: left;
+    z-index: 100000;
+    display: block;
+}
+
+.ptk_stat_offline {
+    color: #fff;
 }

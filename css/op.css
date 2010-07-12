@@ -1,4 +1,4 @@
-body {
+.ptbody {
     color: #333333;
     padding:0px;
     margin:10px;
@@ -7,7 +7,7 @@ body {
     font-family: Verdana, "Verdana CE", Arial, "Arial CE", "Lucida Grande CE", lucida, "Helvetica CE", sans-serif;
 }
 
-a {
+.ptlink {
     color: #80e5ff;
     text-decoration: none;
     border-bottom: 1px dotted;
@@ -36,7 +36,7 @@ a {
 }
 
 /* Queue */
-#queue {
+#pt_queue {
     overflow: auto;
     height: 400px;
     padding: 5px;
@@ -44,11 +44,10 @@ a {
     text-align: left;
 }
 
-
 #qcontrol {
     float: right;
     font-weight: bold;
-    color: #80e5ff;
+    color: #000;
     text-decoration: none;
     cursor: pointer;
 }
@@ -119,12 +118,3 @@ a {
 .odd {
 
 }
-
-
-
-
-
-
-
-
-

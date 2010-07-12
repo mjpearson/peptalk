@@ -67,10 +67,7 @@ class ptkChat extends ptkController {
     }
 
     // setup any chat dialog init
-    public function execIndex() {
-
-    }
-
+    public function execIndex() {}
 
     /**
      * Appends a message to the chat log.  If the chat does not exist and the
@@ -129,6 +126,7 @@ class ptkChat extends ptkController {
         $m = $this->_meta;
 
         $op = Session::isOperator();
+
         // If chat does not exist or is a guest without a last message, then
         // we have a problem
         if (!$m->load() || (!$op && !isset($_SESSION[PT_SESSION_PFX.'last']))) {
@@ -152,7 +150,7 @@ class ptkChat extends ptkController {
 
             // polling ignores the last message the client sent
             if ($r['poll'] == 'true') {
-                $lastUUID = UUID::convert($_SESSION[PT_SESSION_PFX.'last'], UUID::UUID_FMT_STR);
+                $lastUUID = UUID::toStr($_SESSION[PT_SESSION_PFX.'last']);
                 unset($cl[$lastUUID]);
             }
 

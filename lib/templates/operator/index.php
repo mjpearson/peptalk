@@ -22,16 +22,27 @@ if (Session::isAdmin()) {
     <link rel="stylesheet" href="css/pt.css" type="text/css" />
     <link rel="stylesheet" href="css/op.css" type="text/css" />
     <link rel="stylesheet" href="css/jquery-ui-1.7.3.custom.css" type="text/css" />
-    <script type="text/javascript" src="js/peptalk.js"></script>
-    <script type="text/javascript" src="js/operator.js"></script>
-    <script type="text/javascript" src="js/queue.js"></script>
-    <script type="text/javascript" src="js/jquery-edit-in-place.js"></script>
-    <body style="font-size:62.5%;">
 
+    <script type="text/javascript" src="<?php echo jSig('peptalk'); ?>"></script>
+    <script type="text/javascript" src="<?php echo jSig('operator'); ?>"></script>
+    <script type="text/javascript" src="<?php echo jSig('queue'); ?>"></script>
+
+    <script type="text/javascript" src="js/jquery-edit-in-place.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            operator.init();
+            //$('#peptalk_online_toggle').attr('checked', true);
+        });
+    </script>
+    <body class="ptbody" style="font-size:62.5%;">
+        
+        <?php if ($_SESSION[PT_SESSION_PFX.'userlocal']) { ?>
         <div id="banner">
             Peptalk v0.1
-            <a href="javascript:operator.logout()" style="float:right">Logout</a>
+                <a class="ptlink" href="javascript:operator.logout()" style="float:right">Logout</a>
         </div>
+        <?php } ?>
+
         <div id="container">
             <div style="position:absolute; left:400px; top: 50px;" id="peptalk_div"></div>
             <div id="opcontrol">
@@ -74,9 +85,9 @@ if (Session::isAdmin()) {
                 </div>
                 <?php } ?>
                 
-                <h3><a id="queueheader" href="#">Support Queue</a></h3>
+                <h3><a id="peptalk_queueheader" href="#">Support Queue</a></h3>
                 <div style="padding: 0px;">
-                    <div id="queue"></div>
+                    <div id="pt_queue"></div>
                 </div>
 
                 <h3><a href="#">Transcripts</a></h3>

@@ -82,6 +82,13 @@ class Meta extends PandraColumnFamily {
         return FALSE;
     }
 
+    /**
+     * Creates a 'meta' chat pointer and initialises the conversation in the
+     * support queue
+     * @param <type> $cid
+     * @param <type> $message
+     * @return <type>
+     */
     public function createQueue($cid, $message) {
         if (!empty($message)) {
             $m = new Meta($cid);

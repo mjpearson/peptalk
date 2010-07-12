@@ -1,0 +1,14 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /peptalk_git/peptalk/
+
+    RewriteCond %{THE_REQUEST} ^(GET|HEAD)\ .*js/([a-z]+)\.([a-z0-9]+)\.js\ HTTP/ [NC]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule js/([a-z]+)\.([a-z0-9]+)\.js ./js/$1.js.php
+
+    RewriteCond $1 !^(index\.php|resources|robots\.txt)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^([^/]+)(/?)(([^/]+))?$ ./index.php?controller=$1&view=$3 [QSA]
+</IfModule>

@@ -35,7 +35,7 @@
  */
 class ptkController {
 
-    private $_ajSource = FALSE;
+    private $_breakout = FALSE;
 
     private $_tplBase = '';
 
@@ -73,12 +73,14 @@ class ptkController {
 
         $tpl = $this->_tplBase.$view.'.php';
         if (!empty($tpl)) {
-            if (!$this->_ajSource && file_exists($this->_tplBase.'_header.php')) include $this->_tplBase.'_header.php';
-            if (file_exists($tpl)) require_once $tpl;
-
-            if (!$this->_ajSource && file_exists($this->_tplBase.'_footer.php')) include $this->_tplBase.'_footer.php';
+            if ($this->_breakout && file_exists($this->_tplBase.'_header.php')) include $this->_tplBase.'_header.php';
+            if (file_exists($tpl)) include $tpl;
+            if ($this->_breakout && file_exists($this->_tplBase.'_footer.php')) include $this->_tplBase.'_footer.php';
         }
+    }
 
+    public function isBreakout() {
+        return $this->_breakout;
     }
 
     /**
@@ -92,7 +94,7 @@ class ptkController {
      *
      */
     public function parseRequest($request) {
-        $this->_ajSource = (isset($request['ajs']) && $request['ajs'] == 1);
+        $this->_breakout = (isset($request['breakout']) && $request['breakout'] == 1);
         $this->_request = $request;
         array_walk($this->_request, array($this, 'sanitise'));
     }
@@ -124,7 +126,7 @@ class ptkController {
                     ($this->_authRequired && $this->checkAuth())) {
 
                 try {
-                    $this->$method();
+                   $this->$method();
                     $this->display($view);
                 } catch (ControllerAuthException $e) {
                     $this->responseNOAUTH();
@@ -158,10 +160,11 @@ class ptkController {
     }
 
     public function responseNOAUTH() {
-        $this->responseErr('Not Authorised');
+        header('HTTP/1.1 401 Unauthorised');
     }
 
     public function responseStatus($status) {
+        header('HTTP/1.1 200 OK');
         echo json_encode(array('status' => $status));
     }
 

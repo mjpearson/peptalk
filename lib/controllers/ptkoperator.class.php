@@ -82,9 +82,6 @@ class ptkOperator extends ptkController {
         
         $r = $this->_request;
 
-        //$r['datefrom'] = '20100501';
-        //$r['dateto'] = '20100511';
-
         if (empty($r['datefrom'])) {
             $this->responseNOP();
         } elseif (empty($r['dateto'])) {
@@ -116,7 +113,7 @@ class ptkOperator extends ptkController {
 
                     $results[$date][] = array(
                         'time' => date('G:i:s', $c->timestamp / 1000),
-                        'cid' => UUID::convert($c->name, UUID::UUID_FMT_STR),
+                        'cid' => UUID::toStr($c->name),
                         'remote' => $payload['REMOTE_ADDR'],
                         'message' => $payload['MSG'],
                         'operator' => $payload['OPERATOR']
@@ -290,8 +287,6 @@ class ptkOperator extends ptkController {
      * memcached
      */
     public function execQPoll() {
-        global $_MemCached, $_mcPfx;
-
         $q = $this->_queue;
         $q->load();
 
@@ -313,9 +308,8 @@ class ptkOperator extends ptkController {
                         'column_family' => $m->getName())),
                 $predicate);
 
-        //print_r($metaMap);
-
-        // grab the first request for the cid, and normalise the client info
+        // iterates through the queue and expires any bad sessions
+        //
         foreach ($q as $cid => $data) {
 
             $client = json_decode($data->value);
@@ -328,19 +322,14 @@ class ptkOperator extends ptkController {
                 }
             }
 
-            // Check the session id can still be found in memcache
-            $mc = $_MemCached->get($_mcPfx.$client->SESSION_ID);
-            if (!$mc) {
-                // check session lock
-                $mc = $_MemCached->get($_mcPfxLock.$client->SESSION_ID);
-            }
-
-            if ($mc && $status == Meta::STATUS_NEW) {
+            // Active sessions for 'new' chats should be in the queue
+            if (Session::sessionExists($client->SESSION_ID) && $status == Meta::STATUS_NEW) {
                 $queue[$cid] = array(
                         'host' => $client->REMOTE_ADDR,
                         'msg' => $client->MSG
                 );
             } else {
+
                 // as long as another op hasn't taken it in the meantime, then
                 // close
                 if ($status != Meta::STATUS_CHAT) {
@@ -394,6 +383,31 @@ class ptkOperator extends ptkController {
         }
 
         $ok ? $this->responseOK() : $this->responseERR($q->getLastError());
+    }
+
+    /**
+     * Sets 'online' status
+     */
+    public function execStat() {
+        $r = $this->_request;
+        if (isset($r['online']) && is_numeric($r['online'])) {
+            $ok = Session::onlineStatus((bool) $r['online']);
+            return ($ok) ? $this->responseOK() : $this->responseErr('Could not mark online status');
+        } else {
+            $this->responseERR('Invalid Request');
+        }
+    }
+
+    /**
+     * Tells the client whether the active session is marked as an 'online' operator
+     */
+    public function execStatMe() {
+        echo (int) Session::isOnline(session_id());
+    }
+
+    public function execOnlinePoll() {
+        $ok = Session::onlinePoll();
+        echo $ok;
     }
 }
 ?>
